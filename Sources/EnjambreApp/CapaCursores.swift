@@ -114,6 +114,7 @@ private final class VistaCursores: NSView {
             actual.fantasma = objetivo.fantasma
             actual.etiqueta = objetivo.etiqueta
             actual.dormido = objetivo.dormido
+            actual.escala = objetivo.escala
             if instantaneo {
                 actual.x = objetivo.x
                 actual.y = objetivo.y
@@ -152,6 +153,7 @@ private final class VistaCursores: NSView {
         let transform = NSAffineTransform()
         transform.translateX(by: punto.x, yBy: punto.y)
         transform.rotate(byRadians: -CGFloat(cursor.angulo))
+        transform.scale(by: CGFloat(max(0.35, cursor.escala)))
         transform.concat()
         let flecha = NSBezierPath()
         flecha.move(to: .zero)
@@ -168,10 +170,10 @@ private final class VistaCursores: NSView {
         flecha.fill()
         flecha.stroke()
         NSGraphicsContext.restoreGraphicsState()
-        if cursor.fantasma { return }
-        let titulo = cursor.nombre + (cursor.etiqueta.isEmpty ? "" : " · \(cursor.etiqueta)")
+        guard !cursor.fantasma, cursor.escala >= 0.6, !cursor.nombre.isEmpty else { return }
+        let titulo = cursor.nombre
         let atributos: [NSAttributedString.Key: Any] = [
-            .font: NSFont.systemFont(ofSize: 12, weight: .semibold),
+            .font: NSFont.systemFont(ofSize: 9, weight: .medium),
             .foregroundColor: NSColor.white.withAlphaComponent(cursor.opacidad),
         ]
         let medida = (titulo as NSString).size(withAttributes: atributos)
@@ -224,6 +226,7 @@ private struct CursorRender {
     var fantasma = false
     var etiqueta = ""
     var dormido = false
+    var escala = 1.0
 }
 
 func colorHex(_ hex: String) -> NSColor {

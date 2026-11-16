@@ -22,8 +22,10 @@ public struct CursorVisual: Equatable, Sendable, Identifiable {
     public var pulso: Double
     public var etiqueta: String
     public var dormido: Bool
+    /// 1 es el tamaño de un cursor de trabajo. El enjambre del vídeo usa valores cerca de 0,5.
+    public var escala: Double
 
-    public init(id: String, nombre: String, colorHex: String, x: Double, y: Double, angulo: Double = -0.7, burbuja: String? = nil, opacidad: Double = 1, fantasma: Bool = false, pulso: Double = 0, etiqueta: String = "", dormido: Bool = false) {
+    public init(id: String, nombre: String, colorHex: String, x: Double, y: Double, angulo: Double = -0.7, burbuja: String? = nil, opacidad: Double = 1, fantasma: Bool = false, pulso: Double = 0, etiqueta: String = "", dormido: Bool = false, escala: Double = 1) {
         self.id = id
         self.nombre = nombre
         self.colorHex = colorHex
@@ -36,6 +38,7 @@ public struct CursorVisual: Equatable, Sendable, Identifiable {
         self.pulso = pulso
         self.etiqueta = etiqueta
         self.dormido = dormido
+        self.escala = escala
     }
 }
 

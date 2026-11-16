@@ -82,6 +82,10 @@ final class HibridoTests: XCTestCase {
         XCTAssertFalse(WebhookHTTP.autorizada(peticion, secreto: "otra"))
         XCTAssertEqual(EntradaWebhook.sugerencia(cuerpo: cuerpo)?.autor, "Grok")
         XCTAssertEqual(DemoGuion.mensajes(hasta: 5).count, 3)
+        let enjambre = DemoGuion.escena(tiempo: 10, agentes: agentesPorDefecto())
+        XCTAssertGreaterThanOrEqual(enjambre.cursores.count, 40)
+        XCTAssertTrue(enjambre.cursores.contains { $0.fantasma && $0.escala < 0.6 })
+        XCTAssertFalse(DemoGuion.lineaDeTiempo(tiempo: 4, agentes: agentesPorDefecto()).isEmpty)
     }
 
     func testNodoSoloCompletaModelos() async throws {

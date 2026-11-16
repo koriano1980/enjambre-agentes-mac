@@ -22,6 +22,8 @@ final class ArranqueMac: NSObject, NSApplicationDelegate {
     private var generacion = 0
     private var enDemo = false
     private let operador = OperadorMac()
+    private let estudio = VentanaEstudio()
+    private var asistente: AsistenteMac?
 
     static func principal(modo: ModoArranque) {
         let app = NSApplication.shared
@@ -33,7 +35,7 @@ final class ArranqueMac: NSObject, NSApplicationDelegate {
             break
         }
         app.delegate = delegado
-        app.setActivationPolicy(.accessory)
+        app.setActivationPolicy(.regular)
         app.run()
     }
 
@@ -49,6 +51,17 @@ final class ArranqueMac: NSObject, NSApplicationDelegate {
         fuente.resume()
         registro = try? RegistroAcciones(archivo: URL(fileURLWithPath: RutasEnjambre.registro(home: RutasEnjambre.homeActual())))
         prepararSelector()
+        if enDemo || AsistenteMac.yaCompletado(home: RutasEnjambre.homeActual()) {
+            abrirInterfaz()
+        } else {
+            let asistente = AsistenteMac(gigabytes: MemoriaEquipo.gigabytes())
+            asistente.alTerminar = { [weak self] in self?.abrirInterfaz() }
+            self.asistente = asistente
+            asistente.mostrar()
+        }
+    }
+
+    private func abrirInterfaz() {
         capa.iniciar()
         operador.alCursor = { [weak self] punto, nombre in
             self?.capa.fijar([CursorVisual(id: "gui", nombre: nombre, colorHex: "#FFFFFF", x: punto.x, y: punto.y, burbuja: "escribiendo", etiqueta: "app")], aviso: nil)
@@ -64,7 +77,7 @@ final class ArranqueMac: NSObject, NSApplicationDelegate {
         voz?.alParcial = { [weak self] texto in self?.barra.fijarCampo(texto) }
         voz?.alFinal = { [weak self] texto in self?.recibirVoz(texto) }
         voz?.alError = { [weak self] texto in self?.barra.fijarResultado(texto) }
-        _ = PermisosMac.accesibilidad(pedir: true)
+        estudio.mostrar(agentes: config.agentesVisibles())
         arrancarTelegram()
         arrancarWebhook()
         arrancarNodo()
@@ -228,10 +241,15 @@ final class ArranqueMac: NSObject, NSApplicationDelegate {
         Task { _ = await sala.publicar(autor: "Enjambre", origen: .sistema, texto: "Parado.") }
     }
 
+    func actualizarEstudio(_ estados: [EstadoAgente], aviso: String) {
+        estudio.aplicarEstados(estados, aviso: aviso)
+    }
+
     private func iniciarDemo() {
         enDemo = true
         let agentes = config.agentesVisibles()
         salaUI.mostrar()
+        estudio.reproducirDemo(agentes: agentes)
         capa.reproducirDemo(agentes: agentes) { [weak self] autor, texto in
             Task { _ = await self?.sala.publicar(autor: autor, origen: .agente, texto: texto) }
         }
@@ -447,7 +465,10 @@ final class PuenteVisual: SumideroVisual {
     }
     func estadoAgentes(_ estados: [EstadoAgente]) async {
         let texto = estados.map { "\($0.nombre): \($0.detalle.isEmpty ? $0.estado : $0.detalle)" }.joined(separator: "\n")
-        await MainActor.run { self.barra.fijarEstados(texto) }
+        await MainActor.run {
+            self.barra.fijarEstados(texto)
+            ArranqueMac.compartido.actualizarEstudio(estados, aviso: "En curso")
+        }
     }
 }
 #endif

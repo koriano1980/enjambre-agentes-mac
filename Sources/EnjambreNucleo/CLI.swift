@@ -161,6 +161,10 @@ public enum CLINucleo {
             return 0
         case .demo(let segundos, let json, _, let explicita):
             let (config, _) = cargarConfiguracion(explicita: explicita, home: home)
+            if CommandLine.arguments.contains("--trazas") {
+                salida(DemoGuion.trazaJSON(segundos: segundos, fps: 8, agentes: config.agentes))
+                return 0
+            }
             salida(textoDemo(segundos: segundos, json: json, agentes: config.agentes))
             return 0
         case .comprobar(let explicita):

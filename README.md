@@ -8,7 +8,8 @@ Por defecto el cerebro es **local y funciona sin internet** (Ollama). Si hay red
 
 - Parte una orden en subtareas y las reparte.
 - Antes de actuar, los agentes pueden **debatir** (propuesta, crítica, fusión). El coordinador es un modelo local.
-- Dibuja un cursor por agente, encima de todo, que no roba los clics. El ratón y el teclado reales van en cola: hay uno solo.
+- La ventana principal imita el estudio del reel: lista de agentes a la izquierda, previsualización al centro, inspector a la derecha y una línea de tiempo abajo, con un bloque por agente que se va llenando.
+- Al culminar, decenas de cursores pequeños se dispersan por la pantalla (como en el vídeo), sin etiquetas grandes. El ratón y el teclado reales van en cola: hay uno solo.
 - Abre Antigravity, ChatGPT, Claude, Muse (Meta AI en meta.ai) o el navegador, escribe en el cuadro y lee la respuesta. Primero por Accesibilidad; si no hay texto, por una captura y el reconocimiento de texto de Apple (Vision).
 - Chat de grupo nativo: escribes o hablas, mencionas con `@Programador`, apruebas o vetas el plan.
 - Telegram (tu bot, tu chat) y, si lo enciendes, un endpoint JSON firmado para que otros agentes (por ejemplo un bot de Grok) dejen **sugerencias**. Esas sugerencias no se ejecutan solas.
@@ -50,7 +51,16 @@ Suma aproximada si estuvieran todos residentes: unos 16,9 GB en el Pro y 9,6 GB 
 
 Sin red, Investigador y las webs (ChatGPT, Claude, Muse, navegador) se quedan en el ancla, con la etiqueta **sin red**. El trabajo lo siguen los locales. Al volver la red, reaparecen. Antigravity está marcado como app local: se intenta igual; si su propia nube no responde, el enjambre sigue sin ella.
 
-## Instalación en el MacBook Pro o en el mini
+## Instalación sin Terminal
+
+1. Descarga `Enjambre-de-Agentes-….dmg` desde las [publicaciones del repositorio](https://github.com/koriano1980/enjambre-agentes-mac/releases) (el disco lo construye la integración continua en un Mac; también puedes pedirlo con la acción «Publicar disco»).
+2. Ábrelo y arrastra **Enjambre de Agentes** a la carpeta Aplicaciones.
+3. Ábrelo desde Aplicaciones. La primera vez macOS puede pedir confirmación (clic derecho → Abrir) porque la firma de la copia pública es ad hoc hasta que haya un certificado de desarrollador.
+4. El asistente, en español, detecta la RAM, pide permiso para instalar Ollama y bajar los modelos del preset, abre Ajustes para Accesibilidad y grabación, y deja la configuración lista. No hace falta escribir comandos.
+
+Sirve en Apple Silicon. El script del disco también intenta Intel (`x86_64`); si el Mac de compilación no tiene ese SDK, el disco sale solo para la arquitectura disponible.
+
+## Instalación en el MacBook Pro o en el mini (si compilas tú)
 
 1. Instala las herramientas de Xcode si `swift` no existe:
 
