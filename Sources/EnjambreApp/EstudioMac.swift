@@ -42,6 +42,11 @@ final class VentanaEstudio {
         vista?.needsDisplay = true
     }
 
+    func aplicarEnlaces(_ enlaces: [String: Bool]) {
+        vista?.enlaces = enlaces
+        vista?.needsDisplay = true
+    }
+
     private func tick() {
         guard demo else { return }
         tiempo += 1.0 / 30.0
@@ -78,6 +83,7 @@ private final class VistaEstudio: NSView {
     var bloques: [BloqueLinea] = []
     var aviso: String?
     var mensaje: String?
+    var enlaces: [String: Bool] = [:]
     private var seleccionado = 0
 
     override var isFlipped: Bool { true }
@@ -184,6 +190,7 @@ private final class VistaEstudio: NSView {
             "Modelo: \(agente.modelo.isEmpty ? "según la red" : agente.modelo)",
             "Proveedor: \(agente.proveedor.rawValue)",
             "Estado: \(estado?.detalle.isEmpty == false ? (estado?.detalle ?? "") : (estado?.estado ?? "en espera"))",
+            cuentaLinea(agente),
         ]
         for (indice, linea) in lineas.enumerated() {
             (linea as NSString).draw(at: NSPoint(x: rect.minX + 16, y: rect.minY + 48 + CGFloat(indice) * 28), withAttributes: [
@@ -191,6 +198,14 @@ private final class VistaEstudio: NSView {
                 .foregroundColor: indice == 0 ? NSColor.white : NSColor(srgbRed: 0.78, green: 0.82, blue: 0.86, alpha: 1),
             ])
         }
+    }
+
+    private func cuentaLinea(_ agente: AgenteConfig) -> String {
+        guard agente.modalidad == .gui || agente.proveedor == .gui else {
+            return agente.modalidad == .online ? "Cuenta: modelo en la nube, si hay clave o Claude Code" : "Cuenta: local, no hace falta enlazar"
+        }
+        if enlaces[agente.id] == true { return "Cuenta: enlazada · sesión tuya" }
+        return "Cuenta: sin enlazar"
     }
 
     private func dibujarTiempo(_ rect: NSRect) {

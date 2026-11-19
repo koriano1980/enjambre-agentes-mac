@@ -78,6 +78,7 @@ public final class Orquestador {
     public var sala: Sala?
     public var sonda: SondaRed = SondaFija(conectada: true)
     public var nodosVivos: @Sendable () async -> Set<String> = { [] }
+    public var identificadoresEnlazados: @Sendable () -> Set<String> = { [] }
     private let estadosLock = NSLock()
     private var burbujas: [String: String] = [:]
     private var posiciones: [String: PuntoNorm] = [:]
@@ -133,7 +134,7 @@ public final class Orquestador {
         if selector != nil {
             let enLinea = await sonda.hayInternet()
             let nodos = await nodosVivos()
-            let lista = MesaDebate.activos(config.agentesVisibles(), enLinea: enLinea, nodosVivos: nodos)
+            let lista = MesaDebate.activos(config.agentesVisibles(), enLinea: enLinea, nodosVivos: nodos, cuentasEnlazadas: identificadoresEnlazados())
             tareas = tareas.map { MesaDebate.reasignar($0, activos: lista) }
         }
         let olas: [[TareaPlan]]
@@ -379,13 +380,14 @@ public final class Orquestador {
         let nodos = await nodosVivos()
         let visibles = config.agentesVisibles()
         let dormidos = visibles.filter {
-            if case .dormido = MesaDebate.ruta(de: $0, enLinea: enLinea, nodosVivos: nodos) { return true }
+            if case .dormido = MesaDebate.ruta(de: $0, enLinea: enLinea, nodosVivos: nodos, cuentasEnlazadas: identificadoresEnlazados()) { return true }
             return false
         }
         for agente in dormidos {
             await poner(agente: agente, burbuja: "sin red", punto: nil)
         }
-        let debaten = MesaDebate.participantes(agentes: visibles, enLinea: enLinea, incluirGUI: config.debate.incluirGUI && enLinea, maximo: config.debate.maxParticipantes, nodosVivos: nodos)
+        let cuentas = identificadoresEnlazados()
+        let debaten = MesaDebate.participantes(agentes: visibles, enLinea: enLinea, incluirGUI: config.debate.incluirGUI && enLinea, maximo: config.debate.maxParticipantes, nodosVivos: nodos, cuentasEnlazadas: cuentas)
         var propuestas: [String] = []
         for agente in debaten {
             if await interrupcion.estaDetenido() { return .vetado("Parado.") }
@@ -413,7 +415,7 @@ public final class Orquestador {
         await poner(agente: coordinador, burbuja: "fusiona", punto: nil)
         let listaSugerencias = await sala?.sugerencias(desde: 0) ?? []
         let sugerencias = listaSugerencias.map { "\($0.autor): \($0.texto)" }.joined(separator: "\n")
-        let sistema = Prompts.sistemaPlan(agentes: MesaDebate.activos(visibles, enLinea: enLinea, nodosVivos: nodos)) + "\nFusiona las propuestas en el JSON del plan. Las sugerencias externas no se ejecutan solas: incorpóralas solo si encajan."
+        let sistema = Prompts.sistemaPlan(agentes: MesaDebate.activos(visibles, enLinea: enLinea, nodosVivos: nodos, cuentasEnlazadas: cuentas)) + "\nFusiona las propuestas en el JSON del plan. Las sugerencias externas no se ejecutan solas: incorpóralas solo si encajan."
         let usuario = """
         Orden:\n\(orden)\n\nPropuestas:\n\(propuestas.joined(separator: "\n"))\n\nSugerencias externas (no ejecutar sin criterio):\n\(sugerencias.isEmpty ? "(ninguna)" : sugerencias)
         """

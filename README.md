@@ -119,6 +119,10 @@ Desde el menú contextual del icono (clic derecho) está **Permisos…**, que vu
 
 Una orden de ejemplo: «crea en el Escritorio un archivo notas.txt que diga hola y resume en una frase qué hiciste».
 
+## Enlazar cuentas
+
+En el asistente, y después con clic derecho en el icono → **Enlazar cuentas…**, se abre cada servicio (ChatGPT, Claude, Gemini, Grok, Muse, Antigravity, Copilot). Si la app está instalada, se usa esa. Si no, una ventana de esta app con un perfil de navegación propio, separado de Safari, que guarda la sesión donde la guarda el sistema. Tú escribes la contraseña. Enjambre no la lee ni la copia: solo mira si hay un campo secreto, un captcha o el cuadro del chat. Un captcha lo resuelves tú. Cuando la sesión se reconoce, ese servicio pasa a ser un agente en línea. El inspector dice «enlazada» o «sin enlazar».
+
 ## Apps de chat (como una persona)
 
 `config/adaptadores.yaml` describe cada app. Para añadir otra, copia un bloque. No hace falta recompilar.

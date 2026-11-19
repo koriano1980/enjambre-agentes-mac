@@ -15,7 +15,7 @@ public enum AporteUsuario: Equatable, Sendable {
 }
 
 public enum MesaDebate {
-    public static func ruta(de agente: AgenteConfig, enLinea: Bool, nodosVivos: Set<String>) -> RutaAgente {
+    public static func ruta(de agente: AgenteConfig, enLinea: Bool, nodosVivos: Set<String>, cuentasEnlazadas: Set<String>? = nil) -> RutaAgente {
         if !agente.nodo.isEmpty {
             if nodosVivos.contains(agente.nodo) {
                 return .remoto(agente.nodo, agente.modelo)
@@ -23,6 +23,9 @@ public enum MesaDebate {
             return .dormido("el nodo \(agente.nodo) no responde")
         }
         if agente.proveedor == .gui || agente.modalidad == .gui {
+            if let cuentasEnlazadas, !cuentasEnlazadas.contains(agente.id) {
+                return .dormido("cuenta sin enlazar")
+            }
             if agente.requiereRed && !enLinea { return .dormido("sin internet") }
             return .gui(agente.id)
         }
@@ -33,15 +36,15 @@ public enum MesaDebate {
         return .local(agente.proveedor, agente.modelo, agente.memoriaGB > 0 ? agente.memoriaGB : 2)
     }
 
-    public static func activos(_ agentes: [AgenteConfig], enLinea: Bool, nodosVivos: Set<String>) -> [AgenteConfig] {
+    public static func activos(_ agentes: [AgenteConfig], enLinea: Bool, nodosVivos: Set<String>, cuentasEnlazadas: Set<String>? = nil) -> [AgenteConfig] {
         agentes.filter {
-            if case .dormido = ruta(de: $0, enLinea: enLinea, nodosVivos: nodosVivos) { return false }
+            if case .dormido = ruta(de: $0, enLinea: enLinea, nodosVivos: nodosVivos, cuentasEnlazadas: cuentasEnlazadas) { return false }
             return true
         }
     }
 
-    public static func participantes(agentes: [AgenteConfig], enLinea: Bool, incluirGUI: Bool, maximo: Int, nodosVivos: Set<String> = []) -> [AgenteConfig] {
-        let utiles = activos(agentes, enLinea: enLinea, nodosVivos: nodosVivos).filter { agente in
+    public static func participantes(agentes: [AgenteConfig], enLinea: Bool, incluirGUI: Bool, maximo: Int, nodosVivos: Set<String> = [], cuentasEnlazadas: Set<String>? = nil) -> [AgenteConfig] {
+        let utiles = activos(agentes, enLinea: enLinea, nodosVivos: nodosVivos, cuentasEnlazadas: cuentasEnlazadas).filter { agente in
             guard agente.debate, !agente.coordinador else { return false }
             if agente.modalidad == .gui || agente.proveedor == .gui { return incluirGUI }
             return true

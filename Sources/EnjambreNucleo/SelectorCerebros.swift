@@ -10,6 +10,7 @@ public final class SelectorCerebros {
     public var home: String
     public var nodos: [String: (host: String, puerto: Int)] = [:]
     public var tokenNodo: String = ""
+    public var identificadoresEnlazados: () -> Set<String> = { [] }
 
     public init(config: Configuracion, cola: ColaModelos, interrupcion: Interrupcion, vivos: ProcesosVivos, directorioNeutral: String, home: String) {
         self.config = config
@@ -22,7 +23,7 @@ public final class SelectorCerebros {
 
     public func completar(agente: AgenteConfig, sistema: String, usuario: String, enLinea: Bool, nodosVivos: Set<String>) async throws -> String {
         if await interrupcion.estaDetenido() { throw ErrorCerebro.detenido }
-        switch MesaDebate.ruta(de: agente, enLinea: enLinea, nodosVivos: nodosVivos) {
+        switch MesaDebate.ruta(de: agente, enLinea: enLinea, nodosVivos: nodosVivos, cuentasEnlazadas: identificadoresEnlazados()) {
         case .dormido(let motivo):
             throw ErrorCerebro.fallo("\(agente.nombre) está en pausa (\(motivo)).")
         case .gui(let id):

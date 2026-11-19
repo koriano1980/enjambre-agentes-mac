@@ -24,6 +24,7 @@ final class ArranqueMac: NSObject, NSApplicationDelegate {
     private let operador = OperadorMac()
     private let estudio = VentanaEstudio()
     private var asistente: AsistenteMac?
+    private lazy var cuentas = VentanaCuentas(home: RutasEnjambre.homeActual())
 
     static func principal(modo: ModoArranque) {
         let app = NSApplication.shared
@@ -78,6 +79,8 @@ final class ArranqueMac: NSObject, NSApplicationDelegate {
         voz?.alFinal = { [weak self] texto in self?.recibirVoz(texto) }
         voz?.alError = { [weak self] texto in self?.barra.fijarResultado(texto) }
         estudio.mostrar(agentes: config.agentesVisibles())
+        cuentas.alCambiar = { [weak self] in self?.refrescarEnlaces() }
+        refrescarEnlaces()
         arrancarTelegram()
         arrancarWebhook()
         arrancarNodo()
@@ -108,6 +111,9 @@ final class ArranqueMac: NSObject, NSApplicationDelegate {
         let selector = SelectorCerebros(config: config, cola: cola, interrupcion: interrupcion, vivos: interrupcionProcesos(), directorioNeutral: neutral, home: RutasEnjambre.homeActual())
         selector.operador = operador
         selector.tokenNodo = config.nodo.token
+        selector.identificadoresEnlazados = { [weak self] in
+            self?.cuentas.enlaces().filter { $0.value }.map(\.key).reduce(into: Set<String>()) { $0.insert($1) } ?? []
+        }
         for nodo in config.nodos where !nodo.host.isEmpty {
             selector.nodos[nodo.nombre] = (nodo.host, nodo.puerto)
         }
@@ -123,6 +129,10 @@ final class ArranqueMac: NSObject, NSApplicationDelegate {
         barra.alDemo = { [weak self] in self?.iniciarDemo() }
         barra.alParar = { [weak self] in self?.pararTodo() }
         barra.alSala = { [weak self] in self?.salaUI.mostrar() }
+        barra.alCuentas = { [weak self] in
+            self?.cuentas.alCambiar = { [weak self] in self?.refrescarEnlaces() }
+            self?.cuentas.mostrar()
+        }
         barra.alPermisos = {
             _ = PermisosMac.accesibilidad(pedir: true)
             _ = PermisosMac.grabacion(pedir: true)
@@ -211,6 +221,9 @@ final class ArranqueMac: NSObject, NSApplicationDelegate {
             orquestador.selector = selector
             orquestador.sala = self.sala
             orquestador.sonda = self.sonda
+            orquestador.identificadoresEnlazados = { [weak self] in
+                self?.cuentas.enlaces().compactMap { $0.value ? $0.key : nil }.reduce(into: Set<String>()) { $0.insert($1) } ?? []
+            }
             orquestador.nodosVivos = { [weak self] in
                 guard let self else { return [] }
                 var vivos = Set<String>()
@@ -239,6 +252,10 @@ final class ArranqueMac: NSObject, NSApplicationDelegate {
         barra.marcarOcupado(false)
         barra.fijarResultado("Parado. Los agentes se detuvieron.")
         Task { _ = await sala.publicar(autor: "Enjambre", origen: .sistema, texto: "Parado.") }
+    }
+
+    private func refrescarEnlaces() {
+        estudio.aplicarEnlaces(cuentas.enlaces())
     }
 
     func actualizarEstudio(_ estados: [EstadoAgente], aviso: String) {

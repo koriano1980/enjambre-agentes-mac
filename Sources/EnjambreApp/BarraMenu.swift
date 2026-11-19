@@ -10,6 +10,7 @@ final class BarraMenu: NSObject {
     var alSala: (() -> Void)?
     var alPermisos: (() -> Void)?
     var alRegistro: (() -> Void)?
+    var alCuentas: (() -> Void)?
     private var item: NSStatusItem?
     private var popover: NSPopover?
     private var campo: NSTextField?
@@ -57,6 +58,7 @@ final class BarraMenu: NSObject {
             menu.addItem(withTitle: "Parar todo", action: #selector(parar), keyEquivalent: "")
             menu.addItem(withTitle: "Chat del enjambre", action: #selector(sala), keyEquivalent: "")
             menu.addItem(withTitle: "Modo demostración", action: #selector(demo), keyEquivalent: "")
+            menu.addItem(withTitle: "Enlazar cuentas…", action: #selector(cuentas), keyEquivalent: "")
             menu.addItem(withTitle: "Permisos…", action: #selector(permisos), keyEquivalent: "")
             menu.addItem(withTitle: "Registro…", action: #selector(registro), keyEquivalent: "")
             menu.addItem(.separator())
@@ -141,6 +143,7 @@ final class BarraMenu: NSObject {
     @objc private func parar() { alParar?() }
     @objc private func sala() { alSala?() }
     @objc private func permisos() { alPermisos?() }
+    @objc private func cuentas() { alCuentas?() }
     @objc private func registro() { alRegistro?() }
     @objc private func salir() { NSApp.terminate(nil) }
 

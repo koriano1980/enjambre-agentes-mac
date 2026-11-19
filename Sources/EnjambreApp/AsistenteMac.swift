@@ -16,6 +16,7 @@ final class AsistenteMac: NSObject {
     private var descargarModelos = true
     private let preset: PresetHardware
     private var trabajando = false
+    private var cuentas: VentanaCuentas?
 
     init(gigabytes: Double) {
         preset = PresetsHardware.elegir(gigabytes: gigabytes, forzado: "auto")
@@ -77,6 +78,7 @@ final class AsistenteMac: NSObject {
         self.progreso = progreso
         self.primario = primario
         self.secundario = secundario
+        cuentas = VentanaCuentas(home: RutasEnjambre.homeActual())
         pintar()
         ventana.center()
         ventana.makeKeyAndOrderFront(nil)
@@ -99,6 +101,10 @@ final class AsistenteMac: NSObject {
             PermisosMac.abrirAjustes("Accessibility")
             paso = 5
             pintar()
+            cuentas?.mostrar()
+        case 5:
+            paso = 6
+            pintar()
         default:
             marcarHecho()
             ventana?.close()
@@ -110,7 +116,7 @@ final class AsistenteMac: NSObject {
         if paso == 2 {
             descargarModelos = false
         }
-        if paso >= 5 || paso == 2 {
+        if paso >= 6 || paso == 2 {
             if paso == 2 {
                 paso = 4
                 pintar()
@@ -121,7 +127,7 @@ final class AsistenteMac: NSObject {
             alTerminar?()
             return
         }
-        paso = min(paso + 1, 5)
+        paso = min(paso + 1, 6)
         pintar()
     }
 
@@ -158,6 +164,14 @@ final class AsistenteMac: NSObject {
             primario?.title = "Abrir Ajustes"
             primario?.isEnabled = true
             secundario?.title = "Después"
+        case 5:
+            titulo?.stringValue = "Enlazar cuentas"
+            cuerpo?.stringValue = "Abro cada servicio con tu cuenta. Si la app está instalada, uso esa. Si no, una ventana propia que recuerda la sesión en este Mac. Tú escribes la clave; yo no la veo ni la guardo."
+            detalle?.stringValue = "ChatGPT, Claude, Gemini, Grok, Muse, Antigravity y Copilot. Cuando veas el chat, pulsa Comprobar o Ya entré."
+            primario?.title = "Seguir"
+            primario?.isEnabled = true
+            secundario?.title = "Después"
+            cuentas?.mostrar()
         default:
             titulo?.stringValue = "Listo"
             cuerpo?.stringValue = "El estudio ya puede abrirse. Los agentes en la nube y las apps de chat (ChatGPT, Claude, Muse, Antigravity) solo entran si hay red y tú ya iniciaste sesión en ellas."

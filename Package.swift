@@ -20,6 +20,7 @@ let package = Package(
                 .linkedFramework("CoreGraphics", .when(platforms: [.macOS])),
                 .linkedFramework("Network", .when(platforms: [.macOS])),
                 .linkedFramework("Vision", .when(platforms: [.macOS])),
+                .linkedFramework("WebKit", .when(platforms: [.macOS])),
             ]
         ),
         .testTarget(

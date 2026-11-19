@@ -86,6 +86,24 @@ final class HibridoTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(enjambre.cursores.count, 40)
         XCTAssertTrue(enjambre.cursores.contains { $0.fantasma && $0.escala < 0.6 })
         XCTAssertFalse(DemoGuion.lineaDeTiempo(tiempo: 4, agentes: agentesPorDefecto()).isEmpty)
+        XCTAssertEqual(DetectorSesion.clasificar(url: "https://chatgpt.com/c/1", hayCampoSecreto: false, hayCaptcha: false, hayComposer: true), .enlazada)
+        XCTAssertEqual(DetectorSesion.clasificar(url: "https://claude.ai/login", hayCampoSecreto: true, hayCaptcha: false, hayComposer: false), .esperandoLogin)
+        XCTAssertEqual(DetectorSesion.clasificar(url: "https://grok.com", hayCampoSecreto: false, hayCaptcha: true, hayComposer: false), .captcha)
+        XCTAssertEqual(DetectorSesion.confirmarManual(senal: .captcha), .captcha)
+        XCTAssertEqual(DetectorSesion.confirmarManual(senal: .desconocida), .enlazada)
+        let chat = AgenteConfig(id: "chatgpt", nombre: "ChatGPT", color: "#fff", rol: "", herramientas: ["operar_chat"], anclaX: 0.2, anclaY: 0.2, modalidad: .gui, proveedor: .gui, modelo: "chatgpt", requiereRed: true)
+        if case .dormido(let motivo) = MesaDebate.ruta(de: chat, enLinea: true, nodosVivos: [], cuentasEnlazadas: []) {
+            XCTAssertTrue(motivo.contains("enlazar"))
+        } else { XCTFail("sin cuenta no entra al enjambre") }
+        if case .gui = MesaDebate.ruta(de: chat, enLinea: true, nodosVivos: [], cuentasEnlazadas: ["chatgpt"]) {} else {
+            XCTFail("con la sesión enlazada sí entra")
+        }
+        let tmp = URL(fileURLWithPath: NSTemporaryDirectory()).appendingPathComponent("cuentas-\(UUID().uuidString).json")
+        try RegistroCuentas.guardar([EstadoCuenta(id: "claude", enlazada: true, via: "perfil", actualizado: "2026-11-19T00:00:00Z")], en: tmp)
+        XCTAssertEqual(RegistroCuentas.enlazadas(en: tmp), ["claude"])
+        let guardado = try String(contentsOf: tmp, encoding: .utf8)
+        XCTAssertFalse(guardado.lowercased().contains("password"))
+        XCTAssertFalse(guardado.lowercased().contains("cookie"))
     }
 
     func testNodoSoloCompletaModelos() async throws {
