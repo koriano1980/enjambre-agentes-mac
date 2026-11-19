@@ -1,0 +1,158 @@
+# Enjambre de Agentes.
+# Los modelos locales se eligen solos según la RAM (preset auto).
+# 24 GB → coder 14B + trabajador 7B + visión 3B (tope ~17 GB, modelos compartidos).
+# 16 GB → coder 7B + trabajadores de 3B y 1.5B + moondream (tope ~11 GB).
+
+cerebro:
+  ruta: claude
+  max_pasos: 6
+  max_paralelo: 2
+  tiempo_espera_segundos: 180
+  adjuntar_capturas: false
+
+hardware:
+  preset: auto
+  presupuesto_gb: 0
+
+debate:
+  activo: true
+  rondas: 1
+  max_participantes: 4
+  incluir_gui: true
+  aprobar: si-destructivo
+  tiempo_aprobacion_segundos: 90
+
+agentes:
+  - id: coordinador
+    nombre: Coordinador
+    color: "#E8F27A"
+    rol: "Moderas el debate, partes la orden y fusionas el resultado."
+    herramientas: [leer_archivo, listar]
+    ancla: { x: 0.12, y: 0.22 }
+    modalidad: local
+    proveedor: ollama
+    modelo: auto
+    coordinador: true
+    debate: true
+
+  - id: programador
+    nombre: Programador
+    color: "#3DDC97"
+    rol: "Editas código y puedes pedir una segunda opinión a Antigravity."
+    herramientas: [shell, leer_archivo, escribir_archivo, editar_archivo, listar, abrir, operar_chat]
+    ancla: { x: 0.28, y: 0.62 }
+    modalidad: local
+    proveedor: ollama
+    modelo: auto
+
+  - id: archivos
+    nombre: Archivos
+    color: "#FFB020"
+    rol: "Organizas archivos. Confirmas antes de borrar."
+    herramientas: [shell, leer_archivo, escribir_archivo, listar, abrir, osascript]
+    ancla: { x: 0.48, y: 0.74 }
+    modalidad: local
+    proveedor: ollama
+    modelo: auto
+
+  - id: escritor
+    nombre: Escritor
+    color: "#FF7AB2"
+    rol: "Redactas en español claro."
+    herramientas: [leer_archivo, escribir_archivo, editar_archivo, listar, teclado]
+    ancla: { x: 0.66, y: 0.58 }
+    modalidad: local
+    proveedor: ollama
+    modelo: auto
+
+  - id: ojos
+    nombre: Ojos
+    color: "#7EE0D6"
+    rol: "Lees la pantalla con un modelo de visión local."
+    herramientas: [captura, ui_arbol, operar_chat, raton, teclado, esperar]
+    ancla: { x: 0.84, y: 0.70 }
+    modalidad: local
+    proveedor: ollama
+    modelo: auto
+    vision: true
+
+  - id: investigador
+    nombre: Investigador
+    color: "#5B8CFF"
+    rol: "Investigas con Claude Code cuando hay internet. Sin red, te retiras."
+    herramientas: [shell, leer_archivo, listar, abrir, captura]
+    ancla: { x: 0.40, y: 0.30 }
+    modalidad: online
+    proveedor: claude-cli
+    modelo: ""
+    requiere_red: true
+
+proveedores:
+  ollama:
+    url: http://127.0.0.1:11434/api/chat
+  mlx:
+    url: http://127.0.0.1:8080/v1/chat/completions
+  llamacpp:
+    url: http://127.0.0.1:8081/v1/chat/completions
+  claude:
+    ruta: claude
+  openai:
+    url: https://api.openai.com/v1/chat/completions
+    clave_api: ""
+    modelo: gpt-4o-mini
+  gemini:
+    clave_api: ""
+    modelo: gemini-2.0-flash
+  grok:
+    url: https://api.x.ai/v1/chat/completions
+    clave_api: ""
+    modelo: grok-2-latest
+  openrouter:
+    url: https://openrouter.ai/api/v1/chat/completions
+    clave_api: ""
+    modelo: ""
+
+voz:
+  idioma: es-ES
+  sintetizar_respuestas: true
+  reconocimiento_en_dispositivo: true
+  max_caracteres_hablados: 400
+
+telegram:
+  activo: false
+  token: ""
+  chat_ids: []
+  # Grupo donde se espeja el chat. Ahí los mensajes son sugerencias, no órdenes.
+  chat_grupo: 0
+
+webhook:
+  activo: false
+  secreto: ""
+  puerto: 8765
+  exponer_lan: false
+  url_salida: ""
+
+nodo:
+  rol: auto
+  nombre: ""
+  puerto: 47831
+  token: ""
+  anfitrion: ""
+
+nodos: []
+
+seguridad:
+  confirmar_destructivo: true
+  tiempo_confirmacion_segundos: 45
+  rutas_escritura:
+    - "~"
+
+interfaz:
+  atajo_orden: "ctrl+alt+cmd+e"
+  atajo_voz: "ctrl+alt+cmd+space"
+  atajo_parar: "ctrl+alt+cmd+k"
+  enjambre_al_terminar: true
+  mostrar_panel_al_ejecutar: true
+  cursores_en_reposo: false
+
+directorio_trabajo: "~"

@@ -1,0 +1,72 @@
+# Adaptadores de apps y webs. Para añadir otro chat, copia un bloque.
+# Los selectores AX se afinan con el Inspector de Accesibilidad.
+# El enjambre no resuelve captchas ni escribe contraseñas: inicias sesión tú.
+
+adaptadores:
+  - id: antigravity
+    nombre: Antigravity
+    tipo: app
+    aplicacion: Antigravity
+    rol_entrada: AXTextArea
+    pista_entrada: Ask
+    tecla_enviar: return
+    rol_respuesta: AXStaticText
+    espera_segundos: 50
+    participa_en_debate: true
+    mostrar_cursor: true
+    requiere_red: false
+    color: "#7CFFB2"
+    ancla: { x: 0.18, y: 0.40 }
+
+  - id: chatgpt
+    nombre: ChatGPT
+    tipo: app
+    aplicacion: ChatGPT
+    url: https://chatgpt.com
+    navegador: Safari
+    rol_entrada: AXTextArea
+    pista_entrada: Message
+    tecla_enviar: return
+    espera_segundos: 40
+    requiere_red: true
+    color: "#74AA9C"
+    ancla: { x: 0.34, y: 0.18 }
+
+  - id: claude
+    nombre: Claude
+    tipo: app
+    aplicacion: Claude
+    url: https://claude.ai
+    navegador: Safari
+    rol_entrada: AXTextArea
+    pista_entrada: Reply
+    tecla_enviar: return
+    requiere_red: true
+    color: "#D4A27F"
+    ancla: { x: 0.52, y: 0.16 }
+
+  - id: muse
+    nombre: Muse
+    tipo: web
+    aplicacion: Safari
+    url: https://meta.ai
+    navegador: Safari
+    rol_entrada: AXTextArea
+    pista_entrada: Ask
+    tecla_enviar: return
+    requiere_red: true
+    color: "#0668E1"
+    ancla: { x: 0.70, y: 0.18 }
+
+  - id: navegador
+    nombre: Navegador
+    tipo: web
+    aplicacion: Safari
+    navegador: Safari
+    rol_entrada: AXTextField
+    pista_entrada: address
+    tecla_enviar: return
+    participa_en_debate: false
+    requiere_red: true
+    color: "#C084FC"
+    ancla: { x: 0.86, y: 0.36 }

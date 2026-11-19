@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleName</key>
+  <string>Enjambre de Agentes</string>
+  <key>CFBundleDisplayName</key>
+  <string>Enjambre de Agentes</string>
+  <key>CFBundleIdentifier</key>
+  <string>com.enjambre.agentes</string>
+  <key>CFBundleExecutable</key>
+  <string>Enjambre</string>
+  <key>CFBundleVersion</key>
+  <string>0.1.0</string>
+  <key>CFBundleShortVersionString</key>
+  <string>0.1.0</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>LSMinimumSystemVersion</key>
+  <string>14.0</string>
+  <key>LSUIElement</key>
+  <false/>
+  <key>NSHighResolutionCapable</key>
+  <true/>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>Enjambre de Agentes usa el micrófono para oír tus órdenes en español, en el Mac.</string>
+  <key>NSSpeechRecognitionUsageDescription</key>
+  <string>Enjambre de Agentes convierte tu voz en texto en el dispositivo cuando macOS lo permite.</string>
+  <key>NSAppleEventsUsageDescription</key>
+  <string>Enjambre de Agentes automatiza otras aplicaciones solo cuando tú das una orden.</string>
+</dict>
+</plist>
